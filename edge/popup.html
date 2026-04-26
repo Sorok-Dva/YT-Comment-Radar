@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title data-i18n="popup_document_title">Youtube Comments Radar</title>
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+      body {
+        min-width: 420px;
+      }
+
+      .shell {
+        padding: 14px;
+      }
+
+      .hero {
+        position: relative;
+      }
+
+      .list-item .meta {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 6px;
+        font-size: 12px;
+        color: var(--muted);
+      }
+    </style>
+  </head>
+  <body>
+    <main class="shell">
+      <section class="panel hero">
+        <span class="eyebrow" data-i18n="popup_eyebrow">Youtube Comments Radar</span>
+        <h1 class="title" data-i18n="popup_title">Youtube Comments Radar</h1>
+        <p class="subtitle" data-i18n="popup_subtitle">
+          L’extension suit vos commentaires connus, interroge l’API YouTube par ID quand elle peut, puis déclenche ses propres notifications.
+        </p>
+
+        <div class="stats">
+          <article class="stat-card">
+            <div class="stat-label" data-i18n="popup_stat_tracked">Commentaires suivis</div>
+            <div class="stat-value" id="tracked-count">0</div>
+          </article>
+          <article class="stat-card">
+            <div class="stat-label" data-i18n="popup_stat_last_import">Dernier import</div>
+            <div class="stat-value" id="last-import">Jamais</div>
+          </article>
+          <article class="stat-card">
+            <div class="stat-label" data-i18n="popup_stat_last_scan">Dernier scan</div>
+            <div class="stat-value" id="last-scan">Jamais</div>
+          </article>
+        </div>
+
+        <div class="toolbar">
+          <button class="button-primary" id="open-history" data-i18n="popup_import_now">Importer maintenant</button>
+          <button class="button-secondary" id="scan-now" data-i18n="popup_scan_now">Scanner maintenant</button>
+          <button class="button-ghost" id="open-options" data-i18n="popup_settings">Réglages</button>
+        </div>
+        <div class="status-line" id="status-line"></div>
+      </section>
+
+      <section class="panel section">
+        <h2 class="section-title" data-i18n="popup_faq_title">FAQ clé API & quota</h2>
+        <p class="section-copy" data-i18n="popup_faq_copy">
+          L’aide essentielle est maintenant visible directement ici.
+        </p>
+        <div class="faq-list">
+          <details class="faq-item">
+            <summary data-i18n="faq_where_key_q">Où créer la clé API ?</summary>
+            <p data-i18n-html="faq_where_key_a">
+              Dans Google Cloud Console : créez ou sélectionnez un projet, activez <strong>YouTube Data API v3</strong>, puis allez dans
+              <strong>APIs &amp; Services &gt; Credentials</strong> et créez une <strong>API key</strong>.
+            </p>
+          </details>
+
+          <details class="faq-item">
+            <summary data-i18n="faq_find_key_q">Où récupérer une clé déjà créée ?</summary>
+            <p data-i18n-html="faq_find_key_a">
+              Ouvrez le bon projet Google Cloud, allez dans <strong>APIs &amp; Services &gt; Credentials</strong>, ouvrez la clé voulue et copiez sa valeur.
+            </p>
+          </details>
+
+          <details class="faq-item">
+            <summary data-i18n="faq_quota_q">Pourquoi une clé neuve peut afficher “quota exceeded” ?</summary>
+            <p data-i18n-html="faq_quota_a">
+              Parce que le quota est lié au <strong>projet Google Cloud</strong>, pas à la clé. Une clé neuve dans un projet déjà vidé hérite du même quota déjà consommé.
+            </p>
+          </details>
+
+          <details class="faq-item">
+            <summary data-i18n="faq_quick_fix_q">Solution rapide si le quota est mort ?</summary>
+            <p data-i18n-html="faq_quick_fix_a">
+              Créez un <strong>nouveau projet Google Cloud</strong>, activez <strong>YouTube Data API v3</strong>, puis créez une nouvelle clé dans ce nouveau projet.
+            </p>
+          </details>
+
+          <details class="faq-item">
+            <summary data-i18n="faq_reset_q">Quand le quota se réinitialise ?</summary>
+            <p data-i18n-html="faq_reset_a">
+              Le quota quotidien YouTube Data se réinitialise à <strong>minuit, heure du Pacifique</strong>. Les requêtes invalides consomment aussi du quota.
+            </p>
+          </details>
+
+          <details class="faq-item">
+            <summary data-i18n="faq_leak_q">J’ai leak ma clé, je fais quoi ?</summary>
+            <p data-i18n-html="faq_leak_a">
+              Faites une rotation ou supprimez-la dans Google Cloud Console, puis remplacez-la dans les réglages de l’extension.
+            </p>
+          </details>
+        </div>
+      </section>
+
+      <section class="panel section">
+        <h2 class="section-title" data-i18n="popup_activity_title">Activité récente</h2>
+        <p class="section-copy" data-i18n="popup_activity_copy">
+          Les gains de likes détectés lors des derniers scans apparaissent ici.
+        </p>
+        <div class="list" id="events-list"></div>
+      </section>
+
+      <section class="panel section">
+        <h2 class="section-title" data-i18n="popup_credits_title">Crédits</h2>
+        <p class="section-copy" data-i18n-html="popup_credits_copy">
+          Extension conçue et développée par <strong>Сорок два</strong>.
+        </p>
+        <div class="credit-card">
+          <img
+            class="credit-avatar"
+            src="https://contrib.rocks/image?repo=sorok-dva/sorok-dva"
+            alt="Сорок два"
+            loading="lazy"
+            decoding="async"
+          />
+          <p class="credit-signature">Сорок два</p>
+          <p class="muted" data-i18n="popup_credit_desc">
+            Dev indépendant. Si le projet te sert, une petite donation aide à financer le temps passé dessus et les prochaines améliorations.
+          </p>
+          <div class="credit-links">
+            <a class="button-link button-secondary" href="https://p-42.fr/sorokdva-yt" target="_blank" rel="noreferrer" data-i18n="popup_credit_site">Site perso</a>
+            <a class="button-link button-ghost" href="https://p-42.fr/github-sorokdva-yt" target="_blank" rel="noreferrer" data-i18n="popup_credit_github">Profil GitHub</a>
+          </div>
+          <a class="button-link button-primary donation-button" href="https://p-42.fr/sorokdva-github-sponsor" target="_blank" rel="noreferrer" data-i18n="popup_credit_donate">
+            Faire une petite donation
+          </a>
+        </div>
+      </section>
+    </main>
+    <script src="i18n.js"></script>
+    <script src="popup.js"></script>
+  </body>
+</html>

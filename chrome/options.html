@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title data-i18n="options_title">Settings · Youtube Comments Radar</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="shell grid">
+      <section class="panel hero">
+        <span class="eyebrow" data-i18n="options_eyebrow">Youtube Comments Radar</span>
+        <h1 class="title" data-i18n="options_title_main">Cadrez le scan pour qu’il reste utile et discret.</h1>
+        <p class="subtitle" data-i18n="options_subtitle">
+          Le mode principal passe désormais par l’API YouTube pour lire directement les likes de vos commentaires.
+        </p>
+      </section>
+
+      <section class="panel section">
+        <h2 class="section-title" data-i18n="options_tracking_title">Paramètres de suivi</h2>
+        <p class="section-copy" data-i18n="options_tracking_copy">
+          Ajoutez votre clé API YouTube Data pour un scan propre et rapide, puis réglez le rythme des vérifications.
+        </p>
+
+        <form id="settings-form">
+          <div class="form-grid">
+            <div class="field field-span-2">
+              <label for="youtube-api-key" data-i18n="options_label_api_key">Clé API YouTube Data v3</label>
+              <input
+                id="youtube-api-key"
+                name="youtubeApiKey"
+                type="password"
+                autocomplete="off"
+                spellcheck="false"
+                placeholder="AIza..."
+              />
+              <small data-i18n-html="options_help_api_key">Utilisée pour appeler `comments.list(id=...)` et lire directement `snippet.likeCount`.</small>
+            </div>
+
+            <div class="field">
+              <label for="scan-interval" data-i18n="options_label_interval">Intervalle entre scans automatiques (minutes)</label>
+              <input id="scan-interval" name="scanIntervalMinutes" type="number" min="30" max="1440" step="30" />
+              <small data-i18n="options_help_interval">Recommandé: entre 120 et 360 minutes.</small>
+            </div>
+
+            <div class="field">
+              <label for="scan-batch-size" data-i18n="options_label_batch">Commentaires scannés par cycle auto</label>
+              <input id="scan-batch-size" name="scanBatchSize" type="number" min="3" max="2500" step="1" />
+              <small data-i18n="options_help_batch">Jusqu’à 2500. Inutile de monter si haut si votre quota API est limité.</small>
+            </div>
+
+            <div class="field">
+              <label for="max-tracked-comments" data-i18n="options_label_max_comments">Nombre max de commentaires conservés</label>
+              <input id="max-tracked-comments" name="maxTrackedComments" type="number" min="20" max="2500" step="5" />
+              <small data-i18n="options_help_max_comments">Jusqu’à 2500. Les imports plus anciens sont purgés au-delà de cette limite.</small>
+            </div>
+
+            <div class="field">
+              <label data-i18n="options_label_notifications">Notifications navigateur</label>
+              <div class="checkbox-row">
+                <input id="notifications-enabled" name="notificationsEnabled" type="checkbox" />
+                <div>
+                  <strong data-i18n="options_notifications_title">Me prévenir dès qu’un compteur monte</strong>
+                  <small data-i18n="options_notifications_help">La notification ouvre ensuite le thread concerné si vous cliquez dessus.</small>
+                </div>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="locale-select" data-i18n="options_label_locale">Langue</label>
+              <select id="locale-select" name="locale">
+                <option value="auto" data-i18n="options_locale_auto">Automatique</option>
+                <option value="fr" data-i18n="options_locale_fr">Français</option>
+                <option value="en" data-i18n="options_locale_en">Anglais</option>
+              </select>
+            </div>
+
+            <div class="field field-span-2">
+              <label data-i18n="options_label_telemetry">KPIs & télémétrie</label>
+              <div class="checkbox-row">
+                <input id="telemetry-enabled" name="telemetryEnabled" type="checkbox" />
+                <div>
+                  <strong data-i18n="options_telemetry_title">Activer les statistiques d’usage anonymes</strong>
+                  <small data-i18n="options_telemetry_help">Envoie uniquement des compteurs agrégés vers yrc.sorokdva.eu : utilisateurs actifs, scans, imports, notifications, volumes suivis.</small>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="toolbar">
+            <button class="button-primary" type="submit" data-i18n="options_save">Enregistrer</button>
+            <button class="button-secondary" id="open-history" type="button" data-i18n="options_open_history">Ouvrir l’historique YouTube</button>
+            <button class="button-danger" id="clear-data" type="button" data-i18n="options_clear">Vider les commentaires suivis</button>
+          </div>
+          <div class="status-line" id="status-line"></div>
+        </form>
+
+        <div class="note" data-i18n="options_note_api_only">
+          Le scan des commentaires passe maintenant uniquement par l’API. Le scraping DOM reste réservé à l’import de l’historique des commentaires.
+        </div>
+        <div class="note" data-i18n="options_note_telemetry_privacy">
+          La télémétrie n’envoie ni texte de commentaire, ni thread URL, ni clé API YouTube. Seulement des identifiants d’installation anonymes et des compteurs.
+        </div>
+      </section>
+
+      <section class="panel section">
+        <h2 class="section-title" data-i18n="options_faq_title">FAQ rapide</h2>
+        <p class="section-copy" data-i18n="options_faq_copy">
+          Le but est d’éviter le combo classique “j’ai créé une clé, ça ne marche pas, je ne sais plus où cliquer”.
+        </p>
+
+        <div class="list">
+          <article class="list-item">
+            <strong data-i18n="faq_where_key_q">Où créer une clé API YouTube Data ?</strong>
+            <p data-i18n-html="faq_where_key_a">
+              Dans Google Cloud Console : créez ou sélectionnez un projet, activez <em>YouTube Data API v3</em>, puis allez dans
+              <em>APIs &amp; Services &gt; Credentials</em> et cliquez sur <em>Create credentials &gt; API key</em>.
+            </p>
+          </article>
+
+          <article class="list-item">
+            <strong data-i18n="faq_find_key_q">J’ai déjà une clé. Où la récupérer ?</strong>
+            <p data-i18n-html="faq_find_key_a">
+              Toujours dans <em>APIs &amp; Services &gt; Credentials</em>. Ouvrez la clé voulue, puis copiez la valeur affichée dans le champ de clé API.
+            </p>
+          </article>
+
+          <article class="list-item">
+            <strong data-i18n="faq_quota_q">Pourquoi une clé neuve peut afficher “quota exceeded” ?</strong>
+            <p data-i18n-html="faq_quota_a">
+              Parce que le quota est attaché au projet Google Cloud, pas à la clé elle-même. Si vous créez une nouvelle clé dans un projet déjà vidé,
+              la nouvelle clé hérite du même quota déjà consommé.
+            </p>
+          </article>
+
+          <article class="list-item">
+            <strong data-i18n="faq_quick_fix_q">Le plus simple si le quota est mort ?</strong>
+            <p data-i18n-html="faq_quick_fix_a">
+              Créez un nouveau projet Google Cloud, activez <em>YouTube Data API v3</em>, puis créez une nouvelle clé dans ce nouveau projet.
+            </p>
+          </article>
+
+          <article class="list-item">
+            <strong data-i18n="faq_reset_q">Quand le quota se réinitialise ?</strong>
+            <p data-i18n-html="faq_reset_a">
+              Le quota quotidien YouTube Data se réinitialise à minuit, heure du Pacifique. Les requêtes invalides comptent aussi dans le quota.
+            </p>
+          </article>
+
+          <article class="list-item">
+            <strong data-i18n="faq_leak_q">Et si j’ai collé ma clé quelque part publiquement ?</strong>
+            <p data-i18n-html="faq_leak_a">
+              Faites une rotation ou supprimez-la dans Google Cloud Console, puis remplacez-la dans les réglages de l’extension.
+            </p>
+          </article>
+        </div>
+      </section>
+    </main>
+    <script src="i18n.js"></script>
+    <script src="options.js"></script>
+  </body>
+</html>

@@ -1,0 +1,62 @@
+{
+  "manifest_version": 3,
+  "name": "Youtube Comments Radar",
+  "short_name": "Youtube Comments Radar",
+  "version": "0.1.0",
+  "description": "Your personal radar to capture likes on your YouTube comments in real time.",
+  "icons": {
+    "16": "ytc-radar.png",
+    "32": "ytc-radar.png",
+    "48": "ytc-radar.png",
+    "128": "ytc-radar.png"
+  },
+  "permissions": [
+    "storage",
+    "alarms",
+    "tabs",
+    "notifications",
+    "scripting"
+  ],
+  "host_permissions": [
+    "https://www.youtube.com/*",
+    "https://myactivity.google.com/*",
+    "https://www.googleapis.com/*",
+    "https://yrc.sorokdva.eu/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.youtube.com/*",
+        "https://myactivity.google.com/*"
+      ],
+      "js": [
+        "i18n.js",
+        "content.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_title": "Youtube Comments Radar",
+    "default_icon": {
+      "16": "ytc-radar.png",
+      "32": "ytc-radar.png",
+      "48": "ytc-radar.png",
+      "128": "ytc-radar.png"
+    },
+    "default_popup": "popup.html"
+  },
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "yt-comment-like-notifier@p42.local",
+      "strict_min_version": "121.0"
+    }
+  }
+}
